@@ -1,0 +1,7 @@
+*.mp4
+*.srt
+*.spec
+keys.txt
+youtube_videos/
+build/
+*.mp3
