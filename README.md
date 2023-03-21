@@ -3,9 +3,10 @@ Creates and outputs subtitles from either Youtube videos or local files.  Curren
 
 If you are doing a local video, you will see a screen pop up for the **ffmpeg** conversion, but once that is done, it will not pop up again for the file unless you delete the mp3 file.
 
-Some future would-be-nices:
+## Some future would-be-nices:
 - Add auto-detect or additional languages (I personally like specifying the language, I feel like it's less error prone but that's just my hunch)
 - Integrate it with the ability to be locally ran with Whisper, requires a good GPU depending on which model to be used.
 - Option to keep or delete the files as a radio button in the GUI
 - Beautify the GUI
 
+Youtube video: https://www.youtube.com/watch?v=ft3A2LijQAo&t=116
