@@ -3,11 +3,11 @@ import subprocess
 import yt_dlp
 import re
 import json
+import shutil
+
 from subprocess import STARTUPINFO, STARTF_USESHOWWINDOW
 from tkinter import messagebox
 
-import os
-import sys
 
 keys = None
 
@@ -17,6 +17,9 @@ with open("keys.txt", "r") as file:
 api_key = keys["API_KEY"]
 
 def transcribe_audio(audio_file, language, prompt):
+    # This is needed because some video titles aren't parsed correctly by openAI.  Yields a "1"
+    new_name = "transcribe.mp3"
+    shutil.copy(audio_file, new_name)
     if language:
         cmd = [
             "curl",
@@ -24,7 +27,7 @@ def transcribe_audio(audio_file, language, prompt):
             "-X","POST",
             "-H",f"Authorization: Bearer {api_key}",
             "-H","Content-Type: multipart/form-data",
-            "-F",f"file=@{audio_file}",
+            "-F",f"file=@{new_name}",
             "-F","model=whisper-1",
             "-F",f"prompt={prompt}",
             "-F","response_format=srt",
@@ -38,7 +41,7 @@ def transcribe_audio(audio_file, language, prompt):
             "-X","POST",
             "-H",f"Authorization: Bearer {api_key}",
             "-H","Content-Type: multipart/form-data",
-            "-F",f"file=@{audio_file}",
+            "-F",f"file=@{new_name}",
             "-F","model=whisper-1",
             "-F",f"prompt={prompt}",
             "-F","response_format=srt",

@@ -1,6 +1,7 @@
 *.mp4
 *.srt
 *.spec
+*.exe
 keys.txt
 youtube_files/
 build/

@@ -1,9 +1,12 @@
 import os
+import sys
+import tempfile
 
+from contextlib import contextmanager
 from tkinter import filedialog
 from tkinter import messagebox
 from utilities import transcribe_audio, download_youtube_video, save_transcription_as_srt, rename_files, update_progress, convert_to_mp3
-from gui import create_app, redirect_output_to_tempfile
+from gui import create_app
 
 
 
@@ -90,6 +93,22 @@ def select_local_file(prompt_entry, progress_bar, language_combobox, quality):
         update_progress(progress_bar, 0)  # Reset the progress bar
 
 
+@contextmanager
+def redirect_output_to_tempfile():
+    # Save the original stdout and stderr
+    orig_stdout = sys.stdout
+    orig_stderr = sys.stderr
+
+    # Create a temporary file and redirect the stdout and stderr
+    with tempfile.NamedTemporaryFile(mode='w+', encoding='utf-8', delete=False) as temp_output:
+        sys.stdout = temp_output
+        sys.stderr = temp_output
+        try:
+            yield temp_output.name
+        finally:
+            # Restore the original stdout and stderr
+            sys.stdout = orig_stdout
+            sys.stderr = orig_stderr
 
 def main():
     app = create_app(start_transcription, select_local_file)

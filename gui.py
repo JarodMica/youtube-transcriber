@@ -1,6 +1,4 @@
 import tkinter as tk
-import sys
-import tempfile
 import threading
 
 from tkinter import font
@@ -8,7 +6,6 @@ from tkinter import ttk
 from tkinter import StringVar
 
 
-from contextlib import contextmanager
 
 def create_button_style(root):
     style = ttk.Style(root)
@@ -56,22 +53,7 @@ def create_context_menu(entry):
     entry.bind("<Button-3>", show_context_menu)
 
 
-@contextmanager
-def redirect_output_to_tempfile():
-    # Save the original stdout and stderr
-    orig_stdout = sys.stdout
-    orig_stderr = sys.stderr
 
-    # Create a temporary file and redirect the stdout and stderr
-    with tempfile.NamedTemporaryFile(mode='w+', encoding='utf-8', delete=False) as temp_output:
-        sys.stdout = temp_output
-        sys.stderr = temp_output
-        try:
-            yield temp_output.name
-        finally:
-            # Restore the original stdout and stderr
-            sys.stdout = orig_stdout
-            sys.stderr = orig_stderr
 
 def create_app(youtube_transcription, select_local_file):
      # create the main window
