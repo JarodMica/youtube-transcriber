@@ -1,12 +1,16 @@
 # auto-transcriber
-Creates and outputs subtitles from either Youtube videos or local files.  Currently only supports Japanese and English, but if you want me to open it up in the future or if you want to modify it for more languages, the script has to modifed so that it passes the correct ISO 639-1 (https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes) when selected in the window.
+This is an auto-transcriber based on openAi's Whisper model.  This repo utilizes the API version of it so it requires an API key, however, it is very affordable in my honest opinion at $0.06 per 10 minutes of transcription.  Now supports all languages that are supported by openAI's whisper, but please note the accuracy is based on the language.  If you want to see your language's accuracy rating (lower is better), check out this graph here: https://github.com/openai/whisper/blob/main/language-breakdown.svg
 
-If you are doing a local video, you will see a screen pop up for the **ffmpeg** conversion, but once that is done, it will not pop up again for the file unless you delete the mp3 file.
+## Features
+- Download videos from youtube and transcribe them with an option to delete the videos afterwards
+- Supports multiple languages, including English, Japanese, Spanish, Korean, German, etc.
+- Transcribe local videos
+- A "Transcription Advice" section which allows you to specify more details about the video you are transcribing (what language, theme, topic, etc).  This can result in a more accurate subtitle file
+- Ability to change the audio quality of the mp3 file.  This is only imporant for file size as the whisper API can only take a maximum file size of 25mb. This means higher quality may result in (but not always) more accurate subtitles at the cost of file size, whereas lower quality will result in smaller file size.
+    - Example: An hour long video at quality of 128 may take up 25 mb, meaning you can only transcribe up to an hour.  In contrast, for the same file size, you may be able to get a 2 hour long video at a quality of 64 due to it resulting in a smaller file size.
 
 ## Some future would-be-nices:
-- Add auto-detect or additional languages (I personally like specifying the language, I feel like it's less error prone but that's just my hunch)
-- Integrate it with the ability to be locally ran with Whisper, requires a good GPU depending on which model to be used.
-- Option to keep or delete the files as a radio button in the GUI
+- Integrate it with the local version of Whisper, *requires a good GPU depending on which model to be used.*
 - Beautify the GUI
 
 Youtube video: https://www.youtube.com/watch?v=ft3A2LijQAo&t=116
