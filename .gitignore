@@ -2,6 +2,8 @@
 *.srt
 *.spec
 keys.txt
-youtube_videos/
+youtube_files/
 build/
 *.mp3
+resources/
+__pycache__/
