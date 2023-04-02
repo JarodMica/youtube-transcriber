@@ -8,3 +8,4 @@ build/
 *.mp3
 resources/
 __pycache__/
+*.psd

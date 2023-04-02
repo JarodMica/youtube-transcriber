@@ -8,15 +8,45 @@ import shutil
 from subprocess import STARTUPINFO, STARTF_USESHOWWINDOW
 from tkinter import messagebox
 
-
 keys = None
+try:
+    with open("keys.txt", "r") as file:
+        keys = json.load(file)
+    api_key = keys["API_KEY"]
+except:
+    pass
 
-with open("keys.txt", "r") as file:
-    keys = json.load(file)
+def local_whisper(audio_file, model, language, prompt):
+    audio_path = audio_file
+    model = model
+    output_format = "srt"
+    temperature = 0.0 #at zero, basically turns off best_of
+    best_of = 5
 
-api_key = keys["API_KEY"]
+    if language:
+        cmd = ['whisper', 
+                audio_path, 
+                '--model', model, 
+                '--output_dir', ".", 
+                '--output_format', output_format,
+                '--initial_prompt', prompt,
+                '--language', language,
+                '--temperature', f'{temperature}',
+                '--best_of',  f'{best_of}']
+    else:
+        cmd = ['whisper', 
+                audio_path, 
+                '--model', model, 
+                '--output_dir', ".", 
+                '--output_format', output_format,
+                '--initial_prompt', prompt,
+                '--temperature', f'{temperature}',
+                '--best_of', f'{best_of}']
 
-def transcribe_audio(audio_file, language, prompt):
+    subprocess.run(cmd)
+
+
+def whisperapi_audio(audio_file, language, prompt):
     # This is needed because some video titles aren't parsed correctly by openAI.  Yields a "1"
     new_name = "transcribe.mp3"
     shutil.copy(audio_file, new_name)
@@ -31,8 +61,7 @@ def transcribe_audio(audio_file, language, prompt):
             "-F","model=whisper-1",
             "-F",f"prompt={prompt}",
             "-F","response_format=srt",
-            "-F",f"language={language}",
-            "-F","temperature=0.2"
+            "-F",f"language={language}"
         ]
     else:
         cmd = [
@@ -44,8 +73,7 @@ def transcribe_audio(audio_file, language, prompt):
             "-F",f"file=@{new_name}",
             "-F","model=whisper-1",
             "-F",f"prompt={prompt}",
-            "-F","response_format=srt",
-            "-F","temperature=0.2"
+            "-F","response_format=srt"
         ]
     
     startupinfo = STARTUPINFO()
@@ -58,9 +86,9 @@ def transcribe_audio(audio_file, language, prompt):
     stdout_lines = result.stdout.splitlines()
     srt_lines = ['1'] + stdout_lines[1:] # add the first line with "1" and start extracting from the second line
     srt_text = "\n".join(srt_lines)
+    os.remove("transcribe.mp3")
 
     return srt_text
-
 
 # function to download YouTube video and extract audio using yt-dlp and ffmpeg
 def download_youtube_video(youtube_link, quality = "64"):
@@ -80,14 +108,12 @@ def download_youtube_video(youtube_link, quality = "64"):
             }
         ],
         'preferredformat': f'{codec}',
-
     }
 
     with yt_dlp.YoutubeDL(ydl_opts) as ydl:
         info_dict = ydl.extract_info(youtube_link, download=True)
 
     audio_file = f"{info_dict['id']}.{codec}"
-
 
     # if the audio file is greater than 25 MB, split it into chunks
     if os.path.getsize(audio_file) > 25 * 1024 * 1024:
@@ -97,7 +123,6 @@ def download_youtube_video(youtube_link, quality = "64"):
         # was supposed to be a chunking function, but didn't implement
 
     return audio_file
-
 
 # function to save transcription as Srt file
 def save_transcription_as_srt(transcription, source, language, is_youtube=True):
@@ -115,7 +140,6 @@ def save_transcription_as_srt(transcription, source, language, is_youtube=True):
     else:
         with open(f"{video_title}.srt", "w", encoding='utf-8') as f:
             f.write(transcription)
-
 
 def rename_files(youtube_link, language, save):
     # Create the "youtube_videos" directory if it doesn't exist

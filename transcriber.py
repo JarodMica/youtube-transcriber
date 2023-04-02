@@ -5,15 +5,16 @@ import tempfile
 from contextlib import contextmanager
 from tkinter import filedialog
 from tkinter import messagebox
-from utilities import transcribe_audio, download_youtube_video, save_transcription_as_srt, rename_files, update_progress, convert_to_mp3
+from utilities import whisperapi_audio, local_whisper, download_youtube_video, save_transcription_as_srt, rename_files, update_progress, convert_to_mp3
 from gui import create_app
 
-
-
-def start_transcription(link_entry, progress_bar, prompt_entry, language_combobox, quality, save):
+def start_transcription(link_entry, progress_bar, prompt_entry, language_combobox, quality, save, local, model):
     youtube_link = link_entry.get()
     quality = quality.get()
     save = save.get()
+    model = model.get()
+    local = local.get()
+
     if language_combobox.get() == "English":
         language = "en"
     elif language_combobox.get() == "Japanese":
@@ -21,9 +22,7 @@ def start_transcription(link_entry, progress_bar, prompt_entry, language_combobo
     else:
         language = False
     
-
     prompt = prompt_entry.get()
-
 
     if not youtube_link.strip():
         messagebox.showerror("Error", "Please enter a YouTube link.")
@@ -39,12 +38,20 @@ def start_transcription(link_entry, progress_bar, prompt_entry, language_combobo
         update_progress(progress_bar, 10)
         audio_file = download_youtube_video(youtube_link, quality)
         update_progress(progress_bar, 30)
-        transcription = transcribe_audio(audio_file, language, prompt)
-        update_progress(progress_bar, 60)
-        save_transcription_as_srt(transcription, youtube_link, language)
-        update_progress(progress_bar, 80)
-        rename_files(youtube_link, language, save)
-        update_progress(progress_bar, 100)
+        # local Whisper path
+        if local == "1":
+            local_whisper(audio_file, model, language, prompt)
+            update_progress(progress_bar, 80)
+            rename_files(youtube_link, language, save)
+            update_progress(progress_bar, 100)
+        # whisperAPI path
+        else:
+            transcription = whisperapi_audio(audio_file, language, prompt)
+            update_progress(progress_bar, 60)
+            save_transcription_as_srt(transcription, youtube_link, language)
+            update_progress(progress_bar, 80)
+            rename_files(youtube_link, language, save)
+            update_progress(progress_bar, 100)
 
         messagebox.showinfo("Success", "Transcription complete. Srt file saved.")
     except Exception as e:
@@ -52,8 +59,10 @@ def start_transcription(link_entry, progress_bar, prompt_entry, language_combobo
     finally:
         update_progress(progress_bar, 0)  # Reset the progress bar
 
-def select_local_file(prompt_entry, progress_bar, language_combobox, quality):
+def select_local_file(prompt_entry, progress_bar, language_combobox, quality, local, model):
     quality = quality.get()
+    local = local.get()
+    model = model.get()
     
     if language_combobox.get() == "English":
         language = "en"
@@ -81,17 +90,21 @@ def select_local_file(prompt_entry, progress_bar, language_combobox, quality):
 
     try:
         update_progress(progress_bar, 30)
-        transcription = transcribe_audio(file_path, language, prompt)
-        update_progress(progress_bar, 60)
-        save_transcription_as_srt(transcription, local_file_path, language, is_youtube=False)
-        update_progress(progress_bar, 100)
+
+        if local == "1":
+            local_whisper(file_path, model, language, prompt)
+            update_progress(progress_bar, 100)
+        else:
+            transcription = whisperapi_audio(file_path, language, prompt)
+            update_progress(progress_bar, 60)
+            save_transcription_as_srt(transcription, local_file_path, language, is_youtube=False)
+            update_progress(progress_bar, 100)
 
         messagebox.showinfo("Success", "Transcription complete. Srt file saved.")
     except Exception as e:
         messagebox.showerror("Error", f"An error occurred during transcription: {e}")
     finally:
         update_progress(progress_bar, 0)  # Reset the progress bar
-
 
 @contextmanager
 def redirect_output_to_tempfile():
