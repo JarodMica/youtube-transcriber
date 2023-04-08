@@ -12,5 +12,6 @@ This is an auto-transcriber based on openAi's Whisper model.  This repo utilizes
 
 ## Some future would-be-nices:
 - Beautify the GUI
+- Have local srt file creation default to the location of the local file
 
 Youtube video: https://www.youtube.com/watch?v=ft3A2LijQAo&t=116
